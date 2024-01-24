@@ -11,4 +11,11 @@ public class HistorialEstado {
     private String userEstado;
     private String detalle;
 
+    public HistorialEstado(EstadoPedido estado, Instant fecha, String userEstado, String detalle) {
+        this.estado = estado;
+        this.fechaEstado = fecha;
+        this.userEstado = userEstado;
+        this.detalle = detalle;
+    }
+
 }
