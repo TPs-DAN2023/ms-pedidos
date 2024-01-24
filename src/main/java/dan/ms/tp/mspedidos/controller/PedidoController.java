@@ -10,22 +10,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dan.ms.tp.mspedidos.dao.PedidoRepository;
 import dan.ms.tp.mspedidos.modelo.Pedido;
+import dan.ms.tp.mspedidos.service.PedidoService;
 
 @RestController
 @RequestMapping("api/pedido")
 public class PedidoController {
     
-    @Autowired PedidoRepository repo;
+
+    @Autowired
+    PedidoService pedidoService;
 
     @PostMapping
     public ResponseEntity<Pedido> guardar(@RequestBody Pedido pedido){
-        return ResponseEntity.ok().body(repo.save(pedido));
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
     public ResponseEntity<List<Pedido>> buscar(){
-        return ResponseEntity.ok().body(repo.findAll());
+        return ResponseEntity.ok().build();
     }
 }
