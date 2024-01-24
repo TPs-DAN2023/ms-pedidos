@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
-@RequestMapping("api/pedido")
+@RequestMapping("api/pedidos")
 public class PedidoController {
     
 
@@ -35,7 +35,7 @@ public class PedidoController {
      * Busqueda por cliente y/o fecha
      */
     @GetMapping
-    public ResponseEntity<List<Pedido>> buscar(@RequestParam String idCliente, @RequestParam(required = false) String fecha){
+    public ResponseEntity<List<Pedido>> buscar(@RequestParam(required = false) String idCliente, @RequestParam(required = false) String fecha){
         //TODO
         return ResponseEntity.ok().build();
     }
