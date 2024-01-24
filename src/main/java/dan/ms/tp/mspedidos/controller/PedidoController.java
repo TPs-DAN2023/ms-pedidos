@@ -1,6 +1,7 @@
 package dan.ms.tp.mspedidos.controller;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import dan.ms.tp.mspedidos.modelo.Pedido;
+import dan.ms.tp.mspedidos.modelo.PedidoDetalle;
+import dan.ms.tp.mspedidos.modelo.Producto;
 import dan.ms.tp.mspedidos.service.PedidoService;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -27,8 +30,29 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<Pedido> guardar(@RequestBody Pedido pedido){
-        //TODO
-        return ResponseEntity.ok().build();
+        
+        // check required fields
+        if(pedido.getNumeroPedido() == null || pedido.getCliente() == null || pedido.getDetallePedido() == null)
+            return ResponseEntity.status(400).build();
+
+        // check cliente relevant data
+        if (pedido.getCliente().getId() == null)
+            return ResponseEntity.status(400).build();
+
+        // check producto relevant data & detalle data
+        Predicate<Producto> productoValido = p -> p.getId() != null && p.getPrecio() != null;
+        Predicate<PedidoDetalle> detalleValido = dp ->  dp.getCantidad() != null  && dp.getDescuento() != null &&
+                                                        dp.getProducto() != null && productoValido.test(dp.getProducto());
+        if(!pedido.getDetallePedido().stream().allMatch(detalleValido))
+            return ResponseEntity.status(400).build();
+
+        try {
+            Pedido pedidoGuardado = pedidoService.save(pedido);
+            return ResponseEntity.status(204).body(pedidoGuardado);
+        } catch (Exception e) {
+            // TODO: handle exceptions
+            return ResponseEntity.status(500).build();
+        }
     }
 
     /*
