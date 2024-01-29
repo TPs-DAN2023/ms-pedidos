@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -23,6 +24,7 @@ import dan.ms.tp.mspedidos.modelo.Producto;
 public class PedidoService {
     
     @Autowired PedidoRepository repo;
+    @Autowired Environment env;
 
     //TODO: complete with API's urls
     public Pedido save(Pedido pedido) throws NotFoundException, UnexpectedResponseException {
@@ -34,7 +36,7 @@ public class PedidoService {
         try {
             
             Cliente cliente = restTemplate.exchange(
-                "..../api/cliente/"+pedido.getCliente().getId(),
+                env.getProperty("env.cliente.url")+pedido.getCliente().getId(),
                 HttpMethod.GET, null,
                 Cliente.class
             ).getBody();
@@ -48,19 +50,19 @@ public class PedidoService {
                 total += dp.getTotal();
 
                 Producto prod = restTemplate.exchange(
-                    "..../api/productos/"+dp.getProducto().getId(),
+                    env.getProperty("env.producto.url")+dp.getProducto().getId(),
                     HttpMethod.GET, null,
                     Producto.class
                 ).getBody();
 
                 if (prod == null) throw new NotFoundException("Producto");
 
-                if (prod.getStock() < dp.getCantidad() && pedido.getEstados().isEmpty()) {
+                if (prod.getStockActual() < dp.getCantidad() && pedido.getEstados().isEmpty()) {
                     pedido.getEstados().add( new HistorialEstado(
                         EstadoPedido.SIN_STOCK,
                         pedido.getFecha(),
                         "Sistema pedidos",
-                        "No hay stock suficiente."+prod.getStock()+"<"+dp.getCantidad()
+                        "No hay stock suficiente."+prod.getStockActual()+"<"+dp.getCantidad()
                     ));
                 }
             }
