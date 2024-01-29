@@ -43,6 +43,8 @@ public class PedidoService {
 
             if (cliente == null) throw new NotFoundException("Cliente");
 
+            pedido.setCliente(cliente);
+
             Double total = 0D;
             for(PedidoDetalle dp : pedido.getDetallePedido()){
                 //TODO: check values
@@ -56,6 +58,7 @@ public class PedidoService {
                 ).getBody();
 
                 if (prod == null) throw new NotFoundException("Producto");
+                dp.setProducto(prod);
 
                 if (prod.getStockActual() < dp.getCantidad() && pedido.getEstados().isEmpty()) {
                     pedido.getEstados().add( new HistorialEstado(

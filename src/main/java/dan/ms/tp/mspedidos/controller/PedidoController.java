@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dan.ms.tp.mspedidos.exception.NotFoundException;
 import dan.ms.tp.mspedidos.modelo.Pedido;
 import dan.ms.tp.mspedidos.modelo.PedidoDetalle;
 import dan.ms.tp.mspedidos.modelo.Producto;
@@ -48,7 +49,9 @@ public class PedidoController {
 
         try {
             Pedido pedidoGuardado = pedidoService.save(pedido);
-            return ResponseEntity.status(204).body(pedidoGuardado);
+            return ResponseEntity.status(201).body(pedidoGuardado);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).build();
         } catch (Exception e) {
             // TODO: handle exceptions
             return ResponseEntity.status(500).build();
