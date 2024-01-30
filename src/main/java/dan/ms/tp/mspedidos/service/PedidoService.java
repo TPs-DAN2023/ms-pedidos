@@ -28,6 +28,14 @@ public class PedidoService {
 
     public Pedido save(Pedido pedido) throws NotFoundException, UnexpectedResponseException {
 
+        //estas validaciones esta aca para evitar llamadas a las api en caso de datos invalidos
+        if (pedido.getDetallePedido().size() > 1000 || pedido.getDetallePedido().isEmpty())
+            throw new IllegalArgumentException("El pedido debe tener entre 1 y 1000 productos");
+        for(PedidoDetalle dp : pedido.getDetallePedido()){
+            if(dp.getProducto().getPrecio() < 0)
+                throw new IllegalArgumentException("El precio del producto debe ser mayor a 0");
+        }
+
         RestTemplate restTemplate = new RestTemplate();
         pedido.setFecha(Instant.now());
         pedido.setEstados(new ArrayList<>());
