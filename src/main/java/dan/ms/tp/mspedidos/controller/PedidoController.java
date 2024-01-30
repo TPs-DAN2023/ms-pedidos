@@ -52,8 +52,9 @@ public class PedidoController {
             return ResponseEntity.status(201).body(pedidoGuardado);
         } catch (NotFoundException e) {
             return ResponseEntity.status(404).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).build();
         } catch (Exception e) {
-            // TODO: handle exceptions
             return ResponseEntity.status(500).build();
         }
     }
