@@ -26,7 +26,6 @@ public class PedidoService {
     @Autowired PedidoRepository repo;
     @Autowired Environment env;
 
-    //TODO: complete with API's urls
     public Pedido save(Pedido pedido) throws NotFoundException, UnexpectedResponseException {
 
         RestTemplate restTemplate = new RestTemplate();
@@ -47,7 +46,6 @@ public class PedidoService {
 
             Double total = 0D;
             for(PedidoDetalle dp : pedido.getDetallePedido()){
-                //TODO: check values
                 dp.setTotal(dp.getCantidad() * dp.getProducto().getPrecio() * (1-dp.getDescuento()));
                 total += dp.getTotal();
 
@@ -58,8 +56,8 @@ public class PedidoService {
                 ).getBody();
 
                 if (prod == null) throw new NotFoundException("Producto");
-                dp.setProducto(prod);
-
+                dp.getProducto().setStockActual(prod.getStockActual());
+                dp.getProducto().setNombre(prod.getNombre());
                 if (prod.getStockActual() < dp.getCantidad() && pedido.getEstados().isEmpty()) {
                     pedido.getEstados().add( new HistorialEstado(
                         EstadoPedido.SIN_STOCK,
