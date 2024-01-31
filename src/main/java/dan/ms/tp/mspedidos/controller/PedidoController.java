@@ -81,9 +81,15 @@ public class PedidoController {
      * Busqueda por id
      */
     @GetMapping("/{id}")
-    public ResponseEntity<List<Pedido>> buscarPorId(@PathVariable String id){
-        //TODO
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Pedido> buscarPorId(@PathVariable String id){
+        try {
+            Pedido p = pedidoService.getPedidoById(id);
+            return ResponseEntity.ok().body(p);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 
     /*

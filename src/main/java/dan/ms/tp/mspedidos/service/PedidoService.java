@@ -109,4 +109,9 @@ public class PedidoService {
             repo.findByClienteFecha(razonSocial, desde, hasta);
     }
 
+    public Pedido getPedidoById(String id) throws NotFoundException {
+        return repo.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Pedido"));
+    }
+
 }
