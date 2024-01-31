@@ -1,5 +1,6 @@
 package dan.ms.tp.mspedidos.controller;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -63,9 +64,17 @@ public class PedidoController {
      * Busqueda por cliente y/o fecha
      */
     @GetMapping
-    public ResponseEntity<List<Pedido>> buscar(@RequestParam(required = false) String idCliente, @RequestParam(required = false) String fecha){
-        //TODO
-        return ResponseEntity.ok().build();
+    public ResponseEntity<List<Pedido>> buscar(@RequestParam(required = false) String razonSocial, 
+            @RequestParam(required = false) Instant desde, @RequestParam(required = false) Instant hasta) {
+        
+        try {
+            List<Pedido> pedidos = pedidoService.getPedidosFilteredBy(razonSocial, desde, hasta);
+            return ResponseEntity.ok().body(pedidos);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            return ResponseEntity.status(500).build();
+        }
+
     }
 
     /*
