@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dan.ms.tp.mspedidos.exception.InvalidOperationException;
 import dan.ms.tp.mspedidos.exception.NotFoundException;
 import dan.ms.tp.mspedidos.modelo.Pedido;
 import dan.ms.tp.mspedidos.modelo.PedidoDetalle;
 import dan.ms.tp.mspedidos.modelo.Producto;
 import dan.ms.tp.mspedidos.service.PedidoService;
-import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
@@ -95,10 +96,18 @@ public class PedidoController {
     /*
      * Actualizacion de estado de pedido a CANCELADO
      */
-    @PutMapping()
-    public ResponseEntity<Pedido> cancelar(@RequestBody Pedido entity) {
-        //TODO
-        return ResponseEntity.ok().build();
+    @PatchMapping("/{id}")
+    public ResponseEntity<Pedido> cancelar(@PathVariable String id) {
+        try {
+            Pedido p = pedidoService.cancelarPedido(id);
+            return ResponseEntity.ok().body(p);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(404).build();
+        } catch (InvalidOperationException e) {
+            return ResponseEntity.status(405).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 
 
