@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import dan.ms.tp.mspedidos.dao.PedidoRepository;
+import dan.ms.tp.mspedidos.exception.InvalidOperationException;
 import dan.ms.tp.mspedidos.exception.NotFoundException;
 import dan.ms.tp.mspedidos.exception.UnexpectedResponseException;
 import dan.ms.tp.mspedidos.modelo.Cliente;
@@ -112,6 +113,19 @@ public class PedidoService {
     public Pedido getPedidoById(String id) throws NotFoundException {
         return repo.findById(id)
                     .orElseThrow(() -> new NotFoundException("Pedido"));
+    }
+
+    public Pedido cancelarPedido(String idPedido) throws NotFoundException, InvalidOperationException {
+        Pedido pedido = repo.findById(idPedido)
+                            .orElseThrow(() -> new NotFoundException("Pedido"));
+        
+        List<EstadoPedido> invalidos = List.of(EstadoPedido.CANCELADO, EstadoPedido.ENTREGADO, EstadoPedido.RECHAZADO, EstadoPedido.EN_DISTRIBUCION);
+        if (pedido.getEstados().stream().anyMatch(e -> invalidos.contains(e.getEstado())))
+            throw new InvalidOperationException("El pedido id: "+idPedido+" no puede ser cancelado");
+
+        HistorialEstado estado = new HistorialEstado(EstadoPedido.CANCELADO, Instant.now(), "Sistema pedidos", "Pedido cancelado");
+        pedido.getEstados().add(estado);
+        return repo.save(pedido);
     }
 
 }
