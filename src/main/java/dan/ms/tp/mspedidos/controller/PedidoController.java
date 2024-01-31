@@ -2,10 +2,10 @@ package dan.ms.tp.mspedidos.controller;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import dan.ms.tp.mspedidos.exception.InvalidOperationException;
 import dan.ms.tp.mspedidos.exception.NotFoundException;
 import dan.ms.tp.mspedidos.modelo.Pedido;
-import dan.ms.tp.mspedidos.modelo.PedidoDetalle;
-import dan.ms.tp.mspedidos.modelo.Producto;
 import dan.ms.tp.mspedidos.service.PedidoService;
 
 
@@ -32,23 +30,7 @@ public class PedidoController {
     PedidoService pedidoService;
 
     @PostMapping
-    public ResponseEntity<Pedido> guardar(@RequestBody Pedido pedido){
-        
-        // check required fields
-        if(pedido.getNumeroPedido() == null || pedido.getCliente() == null || pedido.getDetallePedido() == null)
-            return ResponseEntity.status(400).build();
-
-        // check cliente relevant data
-        if (pedido.getCliente().getId() == null)
-            return ResponseEntity.status(400).build();
-
-        // check producto relevant data & detalle data
-        Predicate<Producto> productoValido = p -> p.getId() != null && p.getPrecio() != null;
-        Predicate<PedidoDetalle> detalleValido = dp ->  dp.getCantidad() != null  && dp.getDescuento() != null &&
-                                                        dp.getProducto() != null && productoValido.test(dp.getProducto());
-        if(!pedido.getDetallePedido().stream().allMatch(detalleValido))
-            return ResponseEntity.status(400).build();
-
+    public ResponseEntity<Pedido> guardar(@RequestBody @Validated Pedido pedido) {
         try {
             Pedido pedidoGuardado = pedidoService.save(pedido);
             return ResponseEntity.status(201).body(pedidoGuardado);
