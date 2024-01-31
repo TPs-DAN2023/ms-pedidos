@@ -2,6 +2,8 @@ package dan.ms.tp.mspedidos.service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -94,6 +96,22 @@ public class PedidoService {
         } catch (RestClientException exc) {
             throw new UnexpectedResponseException(exc.getMessage());
         }
+    }
+
+    public List<Pedido> getPedidosFilteredBy(String razonSocial, Instant desde, Instant hasta) {
+
+        // el repo lo transforma a DATE
+        if (desde == null) desde = new Date(Long.MIN_VALUE).toInstant();
+        if (hasta == null) hasta = new Date(Long.MAX_VALUE).toInstant();
+
+        return razonSocial == null ? 
+            repo.findByFecha(desde, hasta) :
+            repo.findByClienteFecha(razonSocial, desde, hasta);
+    }
+
+    public Pedido getPedidoById(String id) throws NotFoundException {
+        return repo.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Pedido"));
     }
 
 }
