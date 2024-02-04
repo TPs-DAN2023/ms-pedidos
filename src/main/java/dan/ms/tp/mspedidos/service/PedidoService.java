@@ -87,6 +87,7 @@ public class PedidoService {
             return repo.save(pedido);
 
         } catch (RestClientException exc) {
+            System.out.println(exc.toString());
             throw new UnexpectedResponseException(exc.getMessage());
         }
     }
