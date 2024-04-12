@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
@@ -115,13 +116,25 @@ public class PedidoService {
     }
   }
 
-  public List<Pedido> getPedidosFilteredBy(String razonSocial, Instant desde, Instant hasta) {
+  public List<Pedido> getPedidosFilteredBy(String userInfo, String razonSocial, Instant desde, Instant hasta) {
 
     // el repo lo transforma a DATE
     if (desde == null)
       desde = new Date(Long.MIN_VALUE).toInstant();
     if (hasta == null)
       hasta = new Date(Long.MAX_VALUE).toInstant();
+
+    System.out.println("User info: " + userInfo);
+
+    // Parse the userInfo string to get the tipoUsuarioId
+    JSONObject userInfoJson = new JSONObject(userInfo);
+    String tipoUsuarioId = userInfoJson.getJSONObject("tipoUsuario").getString("tipo");
+
+    if ("USUARIO_EMPRESA".equals(tipoUsuarioId)) {
+      razonSocial = userInfoJson.getJSONObject("cliente").getString("razonSocial");
+    }
+
+    System.out.println("Razon social: " + razonSocial);
 
     return razonSocial == null ? repo.findByFecha(desde, hasta) : repo.findByClienteFecha(razonSocial, desde, hasta);
   }
